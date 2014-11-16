@@ -9,6 +9,9 @@ movies="/media/filippo/Elements/Videos"
 # Directories to be ignored ["dir1|dir2|dir3"]
 ignoredir="YouTube|visti"
 
+# Check if tree is installed
+command -v tree >/dev/null 2>&1 || { echo >&2 "This program requires 'tree' but the software is not installed. Aborting."; exit 1; }
+
 echo "Da vedere:" > "${path}/$file"
 tree -I "$ignoredir" "$movies" >> "${path}/$file"
 
