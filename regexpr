@@ -1,0 +1,13 @@
+prima maiuscola
+
+s/\([a-z]\)\([a-zA-Z0-9]*\)/\u\1\2/g
+
+tutte minuscole
+
+'s/(^.*)/\L$1/'
+
+salva n caratteri
+
+s/(\d{n})/$1/
+
+usare /g !

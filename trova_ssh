@@ -1,0 +1,1 @@
+nmap -p22 -oG - $(ip addr | awk '/inet .*global/ {print $2}' | tr '\n' ' ') | awk '/22\/open/ {print $2}' | uniq

@@ -1,0 +1,19 @@
+#! /bin/bash
+#
+#This script creates a quick backup of some config files
+
+tmplist="$(mktemp)"
+
+echo "/home/filippo/Documenti/backup" >> "$tmplist"
+echo "/home/filippo/Documenti/wifi" >> "$tmplist"
+echo "/home/filippo/Documenti/gpg" >> "$tmplist"
+echo "/etc/ssh/banner" >> "$tmplist"
+echo "/home/filippo/.bashrc" >> "$tmplist"
+echo "/home/filippo/.bash_aliases" >> "$tmplist"
+echo "/home/filippo/.vimrc" >> "$tmplist"
+echo "/home/filippo/.gitconfig" >> "$tmplist"
+
+name="backup$(date +%Y%m%d%H%M).tar"
+cat "$tmplist" | xargs tar -cf "$name"
+mv "$name" "$HOME/Dropbox/Public/backup/"
+rm "$tmplist"

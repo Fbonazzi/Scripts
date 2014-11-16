@@ -1,0 +1,6 @@
+#! /bin/bash
+
+# Why in the world would I use this line
+# echo `telnet bofh.jeffballard.us 666 2>/dev/null` |grep -o "Your excuse is:.*$"
+
+telnet bofh.jeffballard.us 666 2>/dev/null | tail -n 1

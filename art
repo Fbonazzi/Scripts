@@ -1,0 +1,1 @@
+yes 'c=(╱ ╲);printf ${c[RANDOM%2]}'|bash

@@ -1,0 +1,23 @@
+#! /bin/bash
+
+# Scritto da Filippo Bonazzi <f.bonazzi@davide.it> 2012
+#
+# Lo script richiede il programma youtube-dl disponibile nei repository di Ubuntu
+
+music="$HOME/Musica/"
+
+function usage {
+	echo "Numero di parametri errato!"
+	echo -e "Uso: $0 [URL]\n"
+	echo "Questo script estrae l'audio dal video di YouTube fornito come parametro."
+	echo "L'audio in formato .mp3 viene salvato nella cartella $music."
+}
+
+if [ $# -ne 1 ]
+then
+	usage
+	exit 1
+fi
+
+cd $music
+youtube-dl --extract-audio --audio-format=mp3 -o "%(title)s.%(ext)s" $1
