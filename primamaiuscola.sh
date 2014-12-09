@@ -10,7 +10,12 @@ do
 	#Nome del file
 	newname="${filename%.*}"
 	#Estensione, se presente
-	safename=$($HOME/Scaricati/Scripts/safe_regex.sh "$newname" extended)
+	safename=$(safe_regex "$newname" extended)
+	safe_return=$?
+	if [ $safe_return -ne 0 ]
+	then
+		exit $safe_return
+	fi
 	extn=$(echo "$filename" | sed -r "s/${safename}(\..*|)$/\1/") # doppi apici necessari per sostituzione variabile
 
 	#rendi maiuscola la prima lettera di ogni parola del nome
@@ -20,5 +25,5 @@ do
 	newname=$(echo "$newname" | sed -r "s/'([A-Z])\>/'\L\1/g")
 
 	#finalmente sposta
-	echo "$name" "${newname}$extn"
+	mv "$name" "${newname}$extn"
 done
