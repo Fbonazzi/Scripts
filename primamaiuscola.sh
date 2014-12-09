@@ -1,6 +1,8 @@
 #! /bin/bash
+#
+# Questo script rinomina tutti i file passati come parametro
+# Richiede safe_regex.sh installato come safe_regex
 
-#Questo script rinomina tutti i file passati come parametro
 
 for name in "$@"
 do
