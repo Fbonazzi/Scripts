@@ -3,6 +3,13 @@
 #
 # Rename flac files passed as parameters according to their tag information
 # in the format %n - %t.flac
+#
+# Get split FLAC files with
+# $ cuebreakpoints $FILE.cue | shnsplit -o flac $FILE.flac
+# $ cuetag $FILE.cue split-track*.flac
+# Then run
+# $ $0 split-track*.flac
+#
 DEBUG=false
 
 for a in "$@"
