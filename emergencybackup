@@ -12,6 +12,7 @@ echo "/home/filippo/.bashrc" >> "$tmplist"
 echo "/home/filippo/.bash_aliases" >> "$tmplist"
 echo "/home/filippo/.vimrc" >> "$tmplist"
 echo "/home/filippo/.gitconfig" >> "$tmplist"
+echo "/home/filippo/.pystartup" >> "$tmplist"
 
 name="backup$(date +%Y%m%d%H%M).tar"
 cat "$tmplist" | xargs tar -cf "$name"
