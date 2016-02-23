@@ -2,19 +2,20 @@
 #
 #This script creates a quick backup of some config files
 
-tmplist="$(mktemp)"
+files=("/home/filippo/Documenti/backup"
+"/home/filippo/Documenti/wifi"
+"/home/filippo/Documenti/gpg"
+"/etc/ssh/banner"
+"/home/filippo/bin"
+"/home/filippo/.bashrc"
+"/home/filippo/.bash_aliases"
+"/home/filippo/.vim"
+"/home/filippo/.vimrc"
+"/home/filippo/.vimrc.pager"
+"/home/filippo/.gitconfig"
+"/home/filippo/.git-prompt-colors.sh"
+"/home/filippo/.pystartup")
 
-echo "/home/filippo/Documenti/backup" >> "$tmplist"
-echo "/home/filippo/Documenti/wifi" >> "$tmplist"
-echo "/home/filippo/Documenti/gpg" >> "$tmplist"
-echo "/etc/ssh/banner" >> "$tmplist"
-echo "/home/filippo/.bashrc" >> "$tmplist"
-echo "/home/filippo/.bash_aliases" >> "$tmplist"
-echo "/home/filippo/.vimrc" >> "$tmplist"
-echo "/home/filippo/.gitconfig" >> "$tmplist"
-echo "/home/filippo/.pystartup" >> "$tmplist"
-
-name="backup$(date +%Y%m%d%H%M).tar"
-cat "$tmplist" | xargs tar -cf "$name"
+name="backup$(date +%Y%m%d%H%M).tar.gz"
+tar --ignore-failed-read -czvf "$name" ${files[*]}
 mv "$name" "$HOME/Dropbox/Public/backup/"
-rm "$tmplist"
