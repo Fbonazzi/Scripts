@@ -1,0 +1,2 @@
+avconv -i "video" -map 0:1 -c:a copy "output"
+ffmpeg -i "video" -vn -acodec copy "output"
