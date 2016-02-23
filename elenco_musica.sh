@@ -1,43 +1,50 @@
 #! /bin/bash
 
-# Path to the backup directory
-path="$HOME/Documenti/backup/musica"
+# Path to the backup directory (N.B. no terminating slash)
+path="$HOME/Documents/backup/musica"
 # Filename
 file="musica_$(date +%Y%m%d%H%M)"
-# Path to the music directory
-music="/media/filippo/LG External HDD Drive/Music"
+# Path to the music directory (N.B. no terminating slash)
+music="/media/$USER/LG External HDD Drive/Music"
 
-cd "$music"
-
-for artist in */
-do
-	echo "$artist" >> "${path}/$file"
-	cd "$artist/"
-	for album in */
+# Use tree if available
+if command -v tree > /dev/null
+then
+	tree --noreport -dno "${path}/$file" "$music"
+# Else use the piolet
+else
+	cd "$music"
+	for artist in */
 	do
-		echo "	$album" >> "${path}/$file"
+		echo "$artist" >> "${path}/$file"
+		cd "$artist/"
+		for album in */
+		do
+			echo "	$album" >> "${path}/$file"
+		done
+		cd ..
+		echo "" >> "${path}/$file"
 	done
-	cd ..
-	echo "" >> "${path}/$file"
-done
+fi
 
 cd "$path"
-
+# Save the latest list
 old=$(readlink musica_latest)
-
+# Link the new file as the latest
 ln -f -s -T $file musica_latest
 
-cmp -s $old $file
-
-if [[ "$?" -eq "0" ]]
+# If the new file and the previous are identical, report it
+if cmp -s "$old" "$file"
 then
+	# If the file contents are identical but the names are different,
+	# keep the most recent file and delete the oldest.
         if [[ "$file" != "$old" ]]
         then
                 rm "$old"
         fi
-        old=$(echo "$old" | sed -e's/.*musica_//')
-        echo "La lista non presenta modifiche dalla versione $old"
+	oldver=$(echo "$old" | sed -e's/.*musica_//')
+        echo "La lista non presenta modifiche dalla versione $oldver"
 fi
 
 #This is to keep things synchronized with Dropbox for easier access
-cp -rLu /home/filippo/Documenti/backup/musica /home/filippo/Dropbox/Public/backup/
+cp -rLu "$path" "$HOME/Dropbox/Public/backup/"
