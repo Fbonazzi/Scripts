@@ -1,19 +1,32 @@
 #! /bin/bash
+# extract() function found somewhere on the web.
+# Adapted to extract archives into named directories.
+#
+# Extract many possible archive types. Extracts the content of the archive
+# in a directory with the basename of the archive.
 
 extract () {
-  if [ -f "$1" ] ; then
+  if [ -f "$1" ]
+  then
     case "$1" in
-      *.tar.bz2)   tar xvjf "$1"        ;;
-      *.tar.gz)    tar xvzf "$1"     ;;
-      *.bz2)       bunzip2 "$1"       ;;
-      *.rar)       unrar x "$1"     ;;
-      *.gz)        gunzip "$1"     ;;
-      *.tar)       tar xvf "$1"        ;;
-      *.tbz2)      tar xvjf "$1"      ;;
-      *.tgz)       tar xvzf "$1"       ;;
-      *.zip)       unzip "$1"     ;;
-      *.Z)         uncompress "$1"  ;;
-      *.7z)        7z x "$1"    ;;
+      *.tar.bz2)
+      tar xvjf "$1" --transform="s|^|${1%.tar.bz2}/|S";;
+      *.tar.gz)
+      tar xvzf "$1" --transform="s|^|${1%.tar.gz}/|S";;
+      *.bz2)
+      n = "${1%.bz2}"; mkdir "$n"; mv "$1" "$n"; cd "$n"; bunzip2 "$1" ;;
+      *.rar)
+      n = "${1%.rar}"; mkdir "$n"; mv "$1" "$n"; cd "$n"; unrar -x "$1" ;;
+      *.gz)
+      n = "${1%.gz}"; mkdir "$n"; mv "$1" "$n"; cd "$n"; gunzip "$1" ;;
+      *.tar)       tar xvf "$1" --transform="s|^|${1%.tar}/|S";;
+      *.tbz2)      tar xvjf "$1" --transform="s|^|${1%.tbz2}/|S";;
+      *.tgz)       tar xvzf "$1" --transform="s|^|${1%.tgz}/|S";;
+      *.zip)       unzip "$1" -d "${1%.zip}" ;;
+      *.Z)
+      n = "${1%.Z}"; mkdir "$n"; mv "$1" "$n"; cd "$n"; uncompress "$1" ;;
+      *.7z)
+      n = "${1%.7z}"; mkdir "$n"; mv "$1" "$n"; cd "$n"; 7z x "$1" ;;
       *)           echo "'$1' cannot be extracted via >extract<" ;;
     esac
   else
