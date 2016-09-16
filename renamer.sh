@@ -9,6 +9,6 @@ mkdir renamed
 
 for name in "$@"
 do
-	newname=$(echo "$name" | sed -r "$regex")
-	cp "$name" renamed/"$newname"
+  newname=$(echo "$name" | sed -r "$regex")
+  cp "$name" renamed/"$newname"
 done
