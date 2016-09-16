@@ -11,8 +11,8 @@ mac_list="/home/filippo/Documenti/mac_list"
 # Check parameters
 if [ $# -ne 1 ]
 then
-	echo "Usage: $0 <mac address>"
-	exit 1
+  echo "Usage: $0 <mac address>"
+  exit 1
 fi
 
 grep "$1" $mac_list

@@ -7,16 +7,16 @@
 music="$HOME/Musica/"
 
 function usage {
-	echo "Numero di parametri errato!"
-	echo -e "Uso: $0 [URL]\n"
-	echo "Questo script estrae l'audio dal video di YouTube fornito come parametro."
-	echo "L'audio in formato .mp3 viene salvato nella cartella $music."
+  echo "Numero di parametri errato!"
+  echo -e "Uso: $0 [URL]\n"
+  echo "Questo script estrae l'audio dal video di YouTube fornito come parametro."
+  echo "L'audio in formato .mp3 viene salvato nella cartella $music."
 }
 
 if [ $# -ne 1 ]
 then
-	usage
-	exit 1
+  usage
+  exit 1
 fi
 
 cd $music

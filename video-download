@@ -7,16 +7,16 @@
 video="$HOME/Video"
 
 function usage {
-	echo "Numero di parametri errato!"
-	echo -e "Uso: $0 [URL]\n"
-	echo "Questo script scarica il video di YouTube fornito come parametro."
-	echo "Il video viene salvato nella cartella $video."
+  echo "Numero di parametri errato!"
+  echo -e "Uso: $0 [URL]\n"
+  echo "Questo script scarica il video di YouTube fornito come parametro."
+  echo "Il video viene salvato nella cartella $video."
 }
 
 if [ $# -ne 1 ]
 then
-	usage
-	exit 1
+  usage
+  exit 1
 fi
 
 cd "$video"

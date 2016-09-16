@@ -28,12 +28,12 @@ cmp -s $old $file
 
 if [[ "$?" -eq "0" ]]
 then
-	if [[ "$file" != "$old" ]]
-	then
-		rm "$old"
-	fi
-	old=$(echo "$old" | sed -e's/.*film_//')
-        echo "La lista non presenta modifiche dalla versione $old"
+  if [[ "$file" != "$old" ]]
+  then
+    rm "$old"
+  fi
+  old=$(echo "$old" | sed -e's/.*film_//')
+  echo "La lista non presenta modifiche dalla versione $old"
 fi
 
 # Synchronize with Dropbox

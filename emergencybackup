@@ -3,17 +3,17 @@
 #This script creates a quick backup of some config files
 
 files=("/home/filippo/Documenti/backup"
-"/home/filippo/Documenti/wifi"
-"/home/filippo/Documenti/gpg"
-"/etc/ssh/banner"
-"/home/filippo/bin"
-"/home/filippo/.bashrc"
-"/home/filippo/.bash_aliases"
-"/home/filippo/.vim"
-"/home/filippo/.vimrc"
-"/home/filippo/.vimrc.pager"
-"/home/filippo/.gitconfig"
-"/home/filippo/.git-prompt-colors.sh"
+  "/home/filippo/Documenti/wifi"
+  "/home/filippo/Documenti/gpg"
+  "/etc/ssh/banner"
+  "/home/filippo/bin"
+  "/home/filippo/.bashrc"
+  "/home/filippo/.bash_aliases"
+  "/home/filippo/.vim"
+  "/home/filippo/.vimrc"
+  "/home/filippo/.vimrc.pager"
+  "/home/filippo/.gitconfig"
+  "/home/filippo/.git-prompt-colors.sh"
 "/home/filippo/.pystartup")
 
 name="backup$(date +%Y%m%d%H%M).tar.gz"

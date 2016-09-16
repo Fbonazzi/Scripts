@@ -14,17 +14,17 @@ cd /run/user/filippo/gvfs/smb-share\:server\=192.168.1.100\,share\=public/Shared
 
 find . -maxdepth 1 -mindepth 1 -type d | while read dir
 do
-#	dir=$(echo "$dir" | sed 's/\///') #seems to be useless, don't know why it's here (201301141408)
-	echo "$dir" | sed 's/^\.\///' >> $file
-	cd "$dir/"
-	find . -maxdepth 1 -mindepth 1 -type d | while read dir2
-	do
-#		dir2=$(echo "$dir2" | sed 's/\///') #seems to be useless
-		echo -n "	" >> $file
-		echo "$dir2" | sed 's/^\.\///' >> $file
-	done
-	cd ..
-	echo "" >> $file
+  #	dir=$(echo "$dir" | sed 's/\///') #seems to be useless, don't know why it's here (201301141408)
+  echo "$dir" | sed 's/^\.\///' >> $file
+  cd "$dir/"
+  find . -maxdepth 1 -mindepth 1 -type d | while read dir2
+  do
+    #		dir2=$(echo "$dir2" | sed 's/\///') #seems to be useless
+    echo -n "	" >> $file
+    echo "$dir2" | sed 's/^\.\///' >> $file
+  done
+  cd ..
+  echo "" >> $file
 done
 
 cd $prefix
@@ -34,18 +34,18 @@ old=$(ls -la musica_hdd_latest | sed -e 's/.*-> //' | sed -e 's/.*musica/musica/
 
 ln -fs $file musica_hdd_latest
 if [ -z $old ]
-	then
-	echo "Prima esecuzione dello script!"
-	exit
+then
+  echo "Prima esecuzione dello script!"
+  exit
 fi
 
 cmp -s $old $file
 if [[ "$?" -eq "0" ]]
 then
-        if [[ "$file" != "$old" ]]
-        then
-                rm $old
-        fi
-        old=$(echo "$old" | sed -e's/.*musica_hdd//')
-        echo "La lista non presenta modifiche dalla versione $old"
+  if [[ "$file" != "$old" ]]
+  then
+    rm $old
+  fi
+  old=$(echo "$old" | sed -e's/.*musica_hdd//')
+  echo "La lista non presenta modifiche dalla versione $old"
 fi

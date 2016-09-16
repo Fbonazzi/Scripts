@@ -11,16 +11,15 @@ port=8080
 N='^[0-9]+$'
 verbose=0
 
-usage()
-{
-	echo -e "Usage: $0 [OPTIONS] FILE"
-	echo -e "\t-p, --port=PORT	Publish file on PORT [Default: 8080]"
-	echo -e "\t-t, --times=N	Publish file N times [Default: 1]"
-	echo -e "\t			\"0\" means infinite times"
-	echo -e "\t-v, --verbose	Print client data"
-	echo -e "\t-h,--help		Display this help text"
-	echo -e "\nMandatory arguments to long options are also mandatory for any corresponding short options."
-	echo -e "\nReport bugs to\tf.bonazzi@davide.it"
+usage() {
+  echo -e "Usage: $0 [OPTIONS] FILE"
+  echo -e "\t-p, --port=PORT	Publish file on PORT [Default: 8080]"
+  echo -e "\t-t, --times=N	Publish file N times [Default: 1]"
+  echo -e "\t			\"0\" means infinite times"
+  echo -e "\t-v, --verbose	Print client data"
+  echo -e "\t-h,--help		Display this help text"
+  echo -e "\nMandatory arguments to long options are also mandatory for any corresponding short options."
+  echo -e "\nReport bugs to\tf.bonazzi@davide.it"
 }
 
 ARGS=`getopt -o 'p:t:vh' --long 'port:,times:,verbose,help' -n "$0" -- "$@"`
@@ -28,76 +27,77 @@ ARGS=`getopt -o 'p:t:vh' --long 'port:,times:,verbose,help' -n "$0" -- "$@"`
 #Bad arguments
 if [ $? -ne 0 ]
 then
-	exit 1
+  exit 1
 fi
 
 eval set -- "$ARGS"
 
 while :
 do
-	case $1 in
-		-p | --port )
-			if [[ "$2" =~ $N ]]
-			then
-				port="$2"
-			else
-				echo -e "Bad port \"$2\". Using default [$port]"
-			fi
-			shift 2
-			;;
-		-t | --times )
-			if [[ "$2" =~ $N ]]
-			then
-				t="$2"
-			else
-				echo -e "Bad times \"$2\". Using default [$t]"
-			fi
-			shift 2
-			;;
-		-v | --verbose)
-			verbose=1
-			shift
-			;;
-		-h | --help )
-			usage
-			exit 0
-			;;
-		-- )
-			shift
-			break
-			;;
-		-* )
-			echo "$0: error - unrecognized option $1" 1>&2
-			usage
-			exit 1
-			;;
-		* )
-			break
-			;;
-	esac
+  case $1 in
+    -p | --port )
+      if [[ "$2" =~ $N ]]
+      then
+        port="$2"
+      else
+        echo -e "Bad port \"$2\". Using default [$port]"
+      fi
+      shift 2
+    ;;
+    -t | --times )
+      if [[ "$2" =~ $N ]]
+      then
+        t="$2"
+      else
+        echo -e "Bad times \"$2\". Using default [$t]"
+      fi
+      shift 2
+    ;;
+    -v | --verbose)
+      verbose=1
+      shift
+    ;;
+    -h | --help )
+      usage
+      exit 0
+    ;;
+    -- )
+      shift
+      break
+    ;;
+    -* )
+      echo "$0: error - unrecognized option $1" 1>&2
+      usage
+      exit 1
+    ;;
+    * )
+      break
+    ;;
+  esac
 done
 
 if [[ -n "$@" && -f "$@" ]]
 then
-	f="$@"
+  f="$@"
 else
-	echo -e "Bad file \"$@\". Exiting..."
-	exit 1
+  echo -e "Bad file \"$@\". Exiting..."
+  exit 1
 fi
 
 
 if host $(hostname --fqdn) 2>&1 > /dev/null
 then
-	ip="$(hostname --fqdn)"
+  ip="$(hostname --fqdn)"
 else
-	ip=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+  ip=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
 fi
 
 echo -e "Publishing \"$f\" on:"
-while read -r line
+read -r -a lines <<< "$ip"
+for line in "${lines[@]}"
 do
 	echo -e "\t$line:$port"
-done <<< "$ip"
+done
 
 if [ "$t" -eq 0 ]
 then

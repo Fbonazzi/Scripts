@@ -26,7 +26,7 @@ fi
 
 # create message
 function mail_input {
-  echo "ehlo cron" 
+  echo "ehlo cron"
   echo "MAIL FROM: <$from>"
   echo "RCPT TO: <$to>"
   echo "DATA"

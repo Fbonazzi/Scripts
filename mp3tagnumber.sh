@@ -6,11 +6,11 @@ DEBUG=true
 
 for track in "$@"
 do
-	num=$(mp3info -p %n "$track")
-	newname="$num - $track"
-	echo "$track renamed to $newname"
-	if ! $DEBUG
-	then
-		mv "$track" "$newname"
-	fi
+  num=$(mp3info -p %n "$track")
+  newname="$num - $track"
+  echo "$track renamed to $newname"
+  if ! $DEBUG
+  then
+    mv "$track" "$newname"
+  fi
 done

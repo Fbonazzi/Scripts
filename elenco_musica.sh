@@ -10,21 +10,21 @@ music="/media/$USER/LG External HDD Drive/Music"
 # Use tree if available
 if command -v tree > /dev/null
 then
-	tree --noreport -dno "${path}/$file" "$music"
-# Else use the piolet
+  tree --noreport -dno "${path}/$file" "$music"
+  # Else use the piolet
 else
-	cd "$music"
-	for artist in */
-	do
-		echo "$artist" >> "${path}/$file"
-		cd "$artist/"
-		for album in */
-		do
-			echo "	$album" >> "${path}/$file"
-		done
-		cd ..
-		echo "" >> "${path}/$file"
-	done
+  cd "$music"
+  for artist in */
+  do
+    echo "$artist" >> "${path}/$file"
+    cd "$artist/"
+    for album in */
+    do
+      echo "	$album" >> "${path}/$file"
+    done
+    cd ..
+    echo "" >> "${path}/$file"
+  done
 fi
 
 cd "$path"
@@ -36,14 +36,14 @@ ln -f -s -T $file musica_latest
 # If the new file and the previous are identical, report it
 if cmp -s "$old" "$file"
 then
-	# If the file contents are identical but the names are different,
-	# keep the most recent file and delete the oldest.
-        if [[ "$file" != "$old" ]]
-        then
-                rm "$old"
-        fi
-	oldver=$(echo "$old" | sed -e's/.*musica_//')
-        echo "La lista non presenta modifiche dalla versione $oldver"
+  # If the file contents are identical but the names are different,
+  # keep the most recent file and delete the oldest.
+  if [[ "$file" != "$old" ]]
+  then
+    rm "$old"
+  fi
+  oldver=$(echo "$old" | sed -e's/.*musica_//')
+  echo "La lista non presenta modifiche dalla versione $oldver"
 fi
 
 #This is to keep things synchronized with Dropbox for easier access
