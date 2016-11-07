@@ -3,6 +3,7 @@
 #
 # Convert a byte string (e.g. "34a3f217be") into its C byte representation
 # (e.g. "0x34, 0xa3, 0xf2, 0x21, 0xbe") ready to be copy-pasted in C source.
+from __future__ import print_function
 import sys
 
 # Handle one of either command line input or stdin
@@ -32,4 +33,11 @@ for each in content:
     for i in range(0, len(s), 2):
         l.append("0x{}{}".format(s[i], s[i + 1]))
     # Write the comma-joined C representation
-    print(", ".join(l))
+    cj = ", ".join(l)
+    for k, v in enumerate(cj.split(), start=1):
+        print("{}".format(v), end="")
+        if (k % 8) == 0:
+            print("")
+        else:
+            print(" ", end="")
+    print()
