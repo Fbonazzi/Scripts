@@ -5,7 +5,7 @@
 # To be used as a formatter in Vim.
 
 # Generate a temporary file
-tmpfile=$(mktemp)
+tmpfile=$(mktemp --suffix=.tex)
 # Redirect the data from stdin to the temporary file
 cat > "$tmpfile"
 # Split lines on space + at least 2-char word + full stop + space +
