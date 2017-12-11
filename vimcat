@@ -1,14 +1,16 @@
 #!/bin/sh
 #!/usr/bin/env vim
-#! Version of vimcat:
-#! https://github.com/rkitover/vimpager/commit/000794916daafe600806ec2ae5602714a4b0866c
 #! This is a bash script that executes itself as a vimscript to do its work
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
 
 : if 0
+  # Just pass through if not on a tty
+  if [ ! -t 1 ]; then
+    exec cat "${@}"
+  fi
   # try to find a better shell, especially on Solaris
 
-  PATH="$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin"
+  PATH=$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin
 
   _MY_SHELL=/bin/sh
   export _MY_SHELL
@@ -54,12 +56,12 @@
   tmp_dir=/tmp
   mkdir_options="-m 700"
 
-  case "$(uname -s)" in
+  case $(uname -s) in
     MINGW*|MSYS*)
       if [ -n "${temp}" ]; then
         # MSYS2 is a little tricky, we're gonna stick to the user's private temp
         # the -m mode switch to mkdir doesn't work
-        tmp_dir="$(cygpath --unix "${temp}")"
+        tmp_dir=$(cygpath --unix "${temp}")
         mkdir_options=""
       fi
     ;;
@@ -67,53 +69,19 @@
 
   tmp_dir="${tmp_dir}/vimcat_${$}"
 
-  if ! mkdir ${mkdir_options} "${tmp_dir}"; then
-    echo "Could not create temporary directory ${tmp_dir}" >&2
+  if ! mkdir ${mkdir_options} ${tmp_dir}; then
+    echo Could not create temporary directory ${tmp_dir} >&2
     exit 1
   fi 
 
   trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
-  tmp_file_in="${tmp_dir}/vimcat_in.txt"
-  tmp_file_out="${tmp_dir}/vimcat_out.txt"
+  tmp_file=${tmp_dir}/vimcat
 
-  script="$(command -v ${0})"
+  script=$(command -v ${0})
 
-quit() {
-  rm -rf "${tmp_dir}"
-  exit "${@}"
-}
-
-usage() {
-    cat <<'EOF'
-Usage: [32mvimcat [1;34m[[1;35mOPTION[1;34m][0m... [1;34m[[1;35mFILE [1;37m| [1;35m-[1;34m][0m...
-Display [1;35mFILE[0m(s) in the terminal with vim syntax highlighting using ANSI escape codes.
-
-With no [1;35mFILE[0m, or when [1;35mFILE[0m is [1;35m-[0m, read standard input.
-
-  [1;37m-h, --help, --usage[0m		This help screen.
-  [1;37m-n[0m				Print with line numbers.
-  [1;37m-s[0m				Squeeze multiple blank lines into one.
-  [1;37m-o [1;35mFILE[0m | [1;35m-[0m			Output ANSI highlighted text to [1;35mFILE[0m or standard output.
-  [1;37m--cmd [1;35mCOMMAND[0m			Run vim [1;35mCOMMAND[0m before initialization.
-  [1;37m-c [1;35mCOMMAND[0m			Run vim [1;35mCOMMAND[0m after initialization.
-  [1;37m-u [1;35mFILE[0m			Use [1;35mFILE[0m as the vimrc.
-
-Examples:
-  [32mvimcat [1;35mprogram.py[0m		# output [1;35mprogram.py[0m with highlighting to terminal
-
-Project homepage: <[1;34mhttp://github.com/rkitover/vimpager[0m>
-and documentation: <[1;34mhttps://github.com/rkitover/vimpager/blob/master/doc/vimcat.md[0m>
-or available locally via: [32mman [1;35mvimcat[0m
-EOF
-}
-
-  # check for arguments
-  while [ "${#}" -gt 0 ] ; do
+  # check for arguments to pass to vim
+  while [ $# -gt 0 ] ; do
     case "${1}" in
-      '-h'|'--help'|'-help'|'--usage'|'-usage')
-        usage
-        quit 0
-        ;;
       "-c")
         shift
         if [ -z "${extra_c}" ]; then
@@ -137,39 +105,19 @@ EOF
         vimcatrc="${1}"
         shift
         ;;
-      "-o")
-        shift
-        output_file="${1}"
-        shift
-        ;;
-      "-s")
-        shift
-        squeeze_blank_lines=1
-        ;;
-      "-n")
-        shift
-        line_numbers=1
-        ;;
       "--")
         shift
         break
         ;;
       -*)
         echo "${0}: bad option '${1}'"
-        quit 1
+        exit 1
         ;;
       *)
         break
         ;;
     esac
   done
-
-  # Just pass through if not on a tty, unless -o was given
-  if [ -z "${output_file}" ]; then
-    if [ ! -t 1 ]; then
-      exec cat "${@}"
-    fi
-  fi
 
   if [ -z "${vimcatrc}" ]; then
     if [ -f ~/.vimcatrc ]; then
@@ -187,10 +135,6 @@ EOF
     extra_c='silent! echo'
   fi
 
-  if [ -z "${line_numbers}" ]; then
-    line_numbers=0
-  fi
-
   if [ "${#}" -eq 0 ]; then
     set -- -
   fi
@@ -202,62 +146,31 @@ EOF
     fi
 
     if [ "${file}" = "-" ]; then
-      cat - >"${tmp_file_in}"
-      file="${tmp_file_in}"
-    fi
-
-    if [ "${squeeze_blank_lines}" = "1" ]; then
-      cat -- "${file}" > "${tmp_file_in}.work"
-      sed -e '/^[ 	]*$/{
-				N
-				/^[ 	]*\n[ 	]*$/D
-      }' -- "${tmp_file_in}.work" > "${tmp_file_in}"
-      rm -f -- "${tmp_file_in}.work"
-      file="${tmp_file_in}"
+      cat - >${tmp_file}
+      file=${tmp_file}
     fi
 
     # Check that the file exists
     if test -r "${file}" -a -f "${file}"; then
       if test -s "${file}"; then
-        if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
-          dest_file="${tmp_file_out}"
-        else
-          dest_file="${output_file}"
-        fi
-
-        if command -v vim >/dev/null; then
-          vim=vim
-        elif command -v nvim >/dev/null; then
-          vim=nvim
-        else
-          echo "$0: neither vim nor nvim found, vim or nvim is required for vimcat" >&2
-          quit 1
-        fi
-
         if [ -n "${vimcatrc}" ]; then
-          $vim -N -E -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -E -X -R -i NONE -u "${vimcatrc}" --cmd "${extra_cmd}" -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         else
-          $vim -N -E -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -E -X -R -i NONE                  --cmd "${extra_cmd}" -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         fi
-
-        if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
-          cat "${tmp_file_out}"
+        cat "${tmp_file}"
+        # if file doesn't end in a newline, output a newline
+        # regular Solaris tail does not work for this
+        tail_cmd=tail
+        if [ -x /usr/xpg4/bin/tail ]; then
+          tail_cmd=/usr/xpg4/bin/tail
         fi
-
-        if [ -z "${output_file}" ]; then
-          # if file doesn't end in a newline, output a newline
-          # regular Solaris tail does not work for this
-          tail_cmd=tail
-          if [ -x /usr/xpg4/bin/tail ]; then
-            tail_cmd=/usr/xpg4/bin/tail
-          fi
-          if command -v gtail >/dev/null; then
-            tail_cmd=gtail
-          fi
-          last_char="$($tail_cmd -c 1 "${tmp_file_out}")"
-          if [ "${last_char}" != "" ]; then
-            echo
-          fi
+        if command -v gtail >/dev/null; then
+          tail_cmd=gtail
+        fi
+        last_char=$($tail_cmd -c 1 "${tmp_file}")
+        if [ "${last_char}" != "" ]; then
+          echo
         fi
       fi
     else
@@ -265,7 +178,9 @@ EOF
     fi
   done
 
-  quit 0
+  rm -rf "${tmp_dir}"
+
+  exit
 
 : endif
 : endif
@@ -275,6 +190,20 @@ EOF
 : endwhile
 : endif
 : endfor
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
 
 " AnsiHighlight: Allows for marking up a file, using ANSI color escapes when
 " the syntax changes colors, for easy, faithful reproduction.
@@ -286,6 +215,7 @@ EOF
 " credited if you use some of this code elsewhere.
 
 " Copyright (c) 2015, Matthew J. Wozniski {{{1
+" All rights reserved.
 "
 " Redistribution and use in source and binary forms, with or without
 " modification, are permitted provided that the following conditions are met:
@@ -357,7 +287,7 @@ function! s:GroupToAnsi(groupnum)
     unlet fg
   endif
 
-  if !exists('fg') && groupnum != hlID('Normal')
+  if !exists('fg') && !groupnum == hlID('Normal')
     let fg = synIDattr(hlID('Normal'), 'fg', s:type)
     if fg == "" || fg == -1
       unlet fg
@@ -408,12 +338,8 @@ function! s:GroupToAnsi(groupnum)
   return retv
 endfunction
 
-function! AnsiHighlight(output_file, line_numbers)
+function! AnsiHighlight(output_file)
   let retv = []
-
-  if a:line_numbers
-    let ln_field_len = len(line('$'))
-  endif
 
   for lnum in range(1, line('$'))
     let last = hlID('Normal')
@@ -422,48 +348,18 @@ function! AnsiHighlight(output_file, line_numbers)
         " Hopefully fix highlighting sync issues
     exe "norm! " . lnum . "G$"
 
-    let line  = getline(lnum)
-    let cnum  = 1
+    let line = getline(lnum)
 
-    while cnum <=# col('.')
-      " skip ansi codes in the file
-      if cnum <=# col('.') - 1 && line[cnum-1] ==# "\e" && line[cnum] ==# '['
-        let cnum += 2
-        while match(line[cnum-1], '[A-Za-z]') ==# -1
-          let cnum += 1
-        endwhile
-
-        let cnum += 1
-        continue
-      endif
-
-      let concealed = synconcealed(lnum, cnum)
-
-      if empty(concealed) " no conceal feature
-        let concealed = [0]
-      endif
-
-      if concealed[0] !=# 1 && synIDtrans(synID(lnum, cnum, 1)) != last
+    for cnum in range(1, col('.'))
+      if synIDtrans(synID(lnum, cnum, 1)) != last
         let last = synIDtrans(synID(lnum, cnum, 1))
         let output .= s:GroupToAnsi(last)
       endif
 
-      if concealed[0] ==# 1 && &conceallevel !=# 0
-        if &conceallevel ==# 1 || &conceallevel ==# 2
-          let output .= concealed[1]
-        endif
-      else
-        let output .= line[cnum-1]
-      endif
+      let output .= matchstr(line, '\%(\zs.\)\{'.cnum.'}')
       "let line = substitute(line, '.', '', '')
             "let line = matchstr(line, '^\@<!.*')
-      let cnum += 1
-    endwhile
-
-    if a:line_numbers
-      let output = printf("\<Esc>[0m\<Esc>[37;1m%" . ln_field_len . "d ", lnum) . output
-    endif
-
+    endfor
     let retv += [output]
   endfor
   " Reset the colors to default after displaying the file
