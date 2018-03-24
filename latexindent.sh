@@ -4,6 +4,7 @@
 # output.
 # To be used as a formatter in Vim.
 
+
 # Generate a temporary file
 tmpfile=$(mktemp --suffix=.tex)
 # Redirect the data from stdin to the temporary file
@@ -15,8 +16,13 @@ cat > "$tmpfile"
 sed -i -Ee 's/(\ [[:alpha:]]{2,}\.)\ ([A-Z])/\1\n\2/g' "$tmpfile"
 # Remove trailing whitespace
 sed -i -Ee 's/[[:space:]]+$//' "$tmpfile"
-# Pass through latexindent
-latexindent "$tmpfile"
+# Pass through latexindent (if available)
+if command -v latexindent > /dev/null
+then
+  latexindent "$tmpfile"
+else
+  cat "$tmpfile"
+fi
 retval=$?
 rm "$tmpfile"
 exit $retval
