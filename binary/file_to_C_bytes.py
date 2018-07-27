@@ -31,15 +31,14 @@ with open(args.FILE, "rb") as f:
 i = 0
 
 if args.lowercase:
-    for b in a:
-        if i and i % args.no_per_line == 0:
-            print()
-        print("{:#04x}, ".format(b), end="")
-        i+=1
+    fmtstring = "{:#04x}, "
 else:
-    for b in a:
-        if i and i % args.no_per_line == 0:
-            print()
-        print("{:#04X}, ".format(b), end="")
-        i+=1
+    fmtstring = "{:#04X}, "
+
+for b in a:
+    if i and i % args.no_per_line == 0:
+        print()
+    print(fmtstring.format(b), end="")
+    i+=1
+
 print()
