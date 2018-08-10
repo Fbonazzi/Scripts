@@ -19,4 +19,4 @@ ADDRESS=$(echo $https_proxy | sed -E 's/https:\/\/([^:]+):([^@]+)@([^:]+):([0-9]
 PORT=$(echo $https_proxy | sed -E 's/https:\/\/([^:]+):([^@]+)@([^:]+):([0-9]+).*/\4/')
 
 # echo socat - PROXY:"$ADDRESS":$1:$2,proxyport="$PORT",proxyauth="$USERNAME":"$PASSWORD" 1>&2
-socat - "PROXY:$ADDRESS:$1:$2,proxyport=$PORT,proxyauth=$USERNAME:$PASSWORD"
+socat - "PROXY:\"$ADDRESS\":\"$1\":\"$2\",proxyport=\"$PORT\",proxyauth=\"$USERNAME:$PASSWORD\""
